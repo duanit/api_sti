@@ -50,23 +50,26 @@ const buyall = async function () {
     // });
 }
 
-const countbuy = async function () {
+const countbuy = async function (date_match) {
 
 
-   // return new Promise(function (resolve, reject) {
-        // config.db.connect(function(err) {
-        //if (err) throw err;
-        //await  config.db.connect();
-        var sql = "SELECT COUNT(DISTINCT(ticket_number)) as ticketnum,ticket_around,DATE_FORMAT(date_match, '%Y%m%d') as date_match FROM sti_ticket_transaction GROUP BY ticket_around,date_match";
-//config.db.query("SELECT COUNT(DISTINCT(ticket_number)) as ticketnum,ticket_around,DATE_FORMAT(date_match, '%Y%m%d') as date_match FROM sti_ticket_transaction GROUP BY ticket_around,date_match", function (err, result) {
-        //     console.log(result);
-        //     if (err) throw err;
-        //     resolve(result);
-        //     //config.db.end();
-        // });
-        // await config.db.end();
+    // return new Promise(function (resolve, reject) {
+    // config.db.connect(function(err) {
+    //if (err) throw err;
+    //await  config.db.connect();
+    var sql = "SELECT COUNT(DISTINCT(ticket_number)) as ticketnum,sum(ticket_price) as total_price,t.ticket_type, a.desc as ticket_around,DATE_FORMAT(t.date_match, '%Y%m%d') as date_match " +
+            " FROM sti_ticket_transaction t , sti_around a "+
+            " WHERE t.ticket_around = a.code and DATE_FORMAT(t.date_match, '%Y%m%d') = ? "+
+            " GROUP BY t.ticket_around,t.ticket_type,t.date_match ";
+    //config.db.query("SELECT COUNT(DISTINCT(ticket_number)) as ticketnum,ticket_around,DATE_FORMAT(date_match, '%Y%m%d') as date_match FROM sti_ticket_transaction GROUP BY ticket_around,date_match", function (err, result) {
+    //     console.log(result);
+    //     if (err) throw err;
+    //     resolve(result);
+    //     //config.db.end();
+    // });
+    // await config.db.end();
 
-   // });
+    // });
 
     // })
 
@@ -80,7 +83,7 @@ const countbuy = async function () {
 
     // });
     //});
-    const [rows, fields] = await db.promisePool.query(sql);
+    const [rows, fields] = await db.promisePool.query(sql, [date_match]);
     console.log(rows);
     return rows;
 }

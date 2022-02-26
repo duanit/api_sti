@@ -101,8 +101,8 @@ app.post('/ticket/buy', function (req, res) {
     const hrtime = process.hrtime();
     let milliSeconds = parseInt(((hrtime[0] * 1e3) + (hrtime[1]) * 1e-6));
     console.log('milliSeconds: ' + milliSeconds);
-    var todayDate = new Date().toISOString().slice(0, 10);
-    console.log(todayDate);
+    var todayDate = reqbody.date_match;
+    //console.log(todayDate);
 
     reqbody.ticket_number.forEach(ticketNumber => {
         let ticketAround = ticketNumber.substring(0, 2);
@@ -124,7 +124,7 @@ app.post('/ticket/buy', function (req, res) {
             stage: '1',
             code_buy: reqbody.code_buy,
             code_scan_door: reqbody.code_scan_door,
-            date_match: todayDate
+            date_match:todayDate
         };
 
         createticket(dataBuy).then(function () {
@@ -250,17 +250,27 @@ app.get('/ticket/scan/:id', function (req, res) {
 //     });
 
 // });
-
-app.get('/ticket/buyall', function (req, res) {
+app.get('/ticket/buyall/:id', function (req, res) {
+//app.get('/ticket/buyall/:id:', function (req, res) {
     console.log(".......................");
+    console.log('date_match  ' + req.params.id);
+
     //     buyall().then(function (data) {
     // res.json({ 'message': 'ok','result':'00', 'payload': data.length});
-    countbuy().then(function (data) {
+    countbuy(req.params.id.toString()).then(function (data) {
         res.json({ 'message': 'ok', 'result': '00', 'payload': data });
         // res.json(data);
         // response.render('index', {data: data});
     });
 });
+
+app.get('/ticket/buyall', function (req, res) {
+    console.log(".......................");
+    console.log('date_match  ' + req.params.id);
+    res.send('<h1>This is index page</h1>');
+
+});
+
 app.get('/', function (req, res) {
 
     res.send('<h1>This is index page</h1>');
@@ -269,45 +279,6 @@ app.get('/', function (req, res) {
 
 
 
-app.get('/latest', (req, res) => {
-    request(url, (error, response, html) => {
-        if (!error && response.statusCode === 200) {
-            const $ = cheerio.load(html)
-            date = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(5) > td.span.bg-span.txtd.al-r').text()
-            update_time = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(5) > td.em.bg-span.txtd.al-r').text()
-            gold_buy = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(3) > td:nth-child(3)').text()
-            gold_sell = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(3) > td:nth-child(2)').text()
-            goldBar_buy = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(2) > td:nth-child(3)').text()
-            goldBar_sell = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(2) > td:nth-child(2)').text()
-            res.json({
-                status: 'success',
-                response: {
-                    date: date,
-                    update_time: update_time,
-                    price: {
-                        gold: {
-                            buy: gold_buy,
-                            sell: gold_sell,
-                        },
-                        gold_bar: {
-                            buy: goldBar_buy,
-                            sell: goldBar_sell,
-                        },
-                    }
-                }
-            },
-                200,
-            )
-        } else {
-            res.json({
-                status: 'failure',
-                response: 'Service is unavailable, Please try again later.',
-            },
-                404,
-            )
-        }
-    })
-})
 
 
 /* สั่งให้ server ทำการรัน Web Server ด้วย port ที่เรากำหนด */
